@@ -1,4 +1,4 @@
-# aceFelix 个人知识图谱
+# aceFelix Personal Knowledge Graph
 
 [![CI](https://github.com/aceFelix/acefelix/actions/workflows/ci.yml/badge.svg)](https://github.com/aceFelix/acefelix/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
@@ -8,225 +8,223 @@
 [![Vue](https://img.shields.io/badge/Vue.js-3-42b883?logo=vuedotjs&logoColor=white)](https://vuejs.org/)
 [![MCP](https://img.shields.io/badge/MCP-Server-5c6bc0)](https://modelcontextprotocol.io/)
 
-基于手动维护数据的个人知识图谱系统，支持实体和关系的增删改查、图结构查询，并提供宇宙银河主题的 3D 可视化展示。
+A personal knowledge graph system built around manually maintained data. It supports creating, reading, updating, and deleting entities and relationships, graph structure queries, and a universe- and galaxy-themed 3D visualization.
 
 <p align="center">
-  <img src="assets/zhishitupu.png" alt="AceFelix 知识图谱：宇宙银河主题 3D 可视化" width="90%">
+  <img src="assets/zhishitupu.png" alt="AceFelix Knowledge Graph: universe- and galaxy-themed 3D visualization" width="90%">
   <br>
-  <sub>实体即行星：气态云带 / 海陆地貌 + 大气辉光，背景含星空、银河旋臂与星云</sub>
+  <sub>Entities as planets: gas cloud bands or land-and-ocean terrain with atmospheric glow, surrounded by a starfield, spiral galaxy arms, and nebulae.</sub>
 </p>
 
-## 功能特性
+## Features
 
-- **知识图谱核心**：NetworkX 图引擎 + JSON 持久化，支持实体/关系增删改查
-- **GraphRAG 自动抽取**：丢入文本/文档/会话记录，LLM 自动抽取实体关系入库；五道防噪闸保证闲聊零写入，支持 `dry_run` 预览与查重
-- **3D 可视化**：基于 3d-force-graph（Three.js）的力导向 3D 图，节点为程序化生成的**真实行星**（气态云带/风暴斑或海陆/环形山，带大气辉光与缓慢自转），背景含星空、银河旋臂、星云、黑洞
-- **动态类型**：实体类型与关系类型支持增删改查、改色、改名（级联更新）、中文标签，删除有保护
-- **图查询**：邻居子图、两点间关联路径、共同邻居、搜索
-- **交互模式**：单击高亮一跳关系、聚焦两跳深挖、路径查询、一键重置
-- **实体管理**：列表展示、类型过滤、名称搜索、增删改查，属性支持**图片与文档（.pdf/.md/.txt/.docx/.xmind）的 URL 引用与本地上传**
-- **数据保护**：乐观锁防并发覆盖，每次保存自动滚动备份（保留 20 份），原子写入防损坏
-- **统计信息**：实体数、关系数、类型分布
-- **Agent 接入**：MCP Server 将图谱以标准协议暴露给任意 AI Agent（jarvis、Claude Desktop 等），Agent 可查询画像、搜索实体、探索关联，经确认后新增实体/关系
+- **Knowledge graph core**: NetworkX graph engine with JSON persistence; full CRUD operations for entities and relationships.
+- **Automatic GraphRAG extraction**: Supply text, documents, or conversation logs and an LLM extracts entities and relationships into the graph. Five noise-prevention gates keep casual chat from being written to the graph. Supports \`dry_run\` previews and duplicate detection.
+- **3D visualization**: Force-directed 3D graph powered by 3d-force-graph (Three.js). Nodes are procedurally generated **realistic planets** (gas bands and storm spots, or oceans, continents, and craters), with atmospheric glow and slow rotation. The background includes stars, spiral galaxy arms, nebulae, and black holes.
+- **Dynamic types**: Create, update, delete, recolor, and rename entity and relationship types. Renaming propagates to related records; Chinese labels are supported and deletion is safeguarded.
+- **Graph queries**: Neighbor subgraphs, relationship paths between two entities, shared neighbors, and search.
+- **Interactive modes**: Click to highlight one-hop relationships, focus to explore two hops, query paths, and reset the view with one action.
+- **Entity management**: List view, type filtering, name search, and CRUD operations. Properties support **image and document (.pdf/.md/.txt/.docx/.xmind) references via URLs and local uploads**.
+- **Data protection**: Optimistic locking prevents concurrent changes from overwriting each other. Each save creates a rolling backup (up to 20 retained), and atomic writes protect against corruption.
+- **Statistics**: Counts of entities and relationships, plus type distribution.
+- **Agent integration**: An MCP server exposes the graph through a standard protocol to AI agents (jarvis, Claude Desktop, etc.). Agents can query profiles, search entities, explore connections, and add entities or relationships with user confirmation.
 
-## 项目结构
+## Project Structure
 
-```
+\`\`\`text
 acefelix/
-├── backend/                  # Python 后端（详见 backend/README.md）
-│   ├── api.py                # 入口：FastAPI REST 服务（含图片上传、知识抽取、静态资源）
-│   ├── mcp_server.py         # 入口：MCP Server（Agent 接入，stdio）
-│   ├── app/                  # 核心包
-│   │   ├── ingest.py         # GraphRAG 抽取管线（文本 → 三元组 → 查重 → 写入）
-│   │   ├── knowledge_graph.py# 知识图谱核心引擎（CRUD + 查询 + 持久化）
-│   │   └── models.py         # 实体/关系数据模型
+├── backend/                  # Python backend (see backend/README.md)
+│   ├── api.py                # Entry point: FastAPI REST service (image uploads, knowledge extraction, static assets)
+│   ├── mcp_server.py         # Entry point: MCP server for agents (stdio)
+│   ├── app/                  # Core package
+│   │   ├── ingest.py         # GraphRAG pipeline (text → triples → deduplication → persistence)
+│   │   ├── knowledge_graph.py# Knowledge graph engine (CRUD + queries + persistence)
+│   │   └── models.py         # Entity/relationship data models
 │   ├── config/
-│   │   └── ingest.toml.example# 抽取模型配置模板（真实配置不入库）
+│   │   └── ingest.toml.example# Extraction model configuration template (actual config is not committed)
 │   ├── scripts/
-│   │   └── seed.py           # 种子数据初始化脚本
+│   │   └── seed.py           # Seed data initialization
 │   ├── tests/
-│   │   ├── test_mcp_server.py# MCP Server 单元测试
-│   │   ├── test_ingest.py    # 抽取管线单元测试（含闲聊零写入负例）
-│   │   └── test_upload_api.py# 文档上传接口测试（白名单/大小/文件名清洗）
+│   │   ├── test_mcp_server.py# MCP server unit tests
+│   │   ├── test_ingest.py    # Extraction pipeline unit tests (including no-write tests for casual chat)
+│   │   └── test_upload_api.py# Document upload tests (allowlist, size limits, filename sanitization)
 │   ├── requirements.txt
 │   ├── data/
-│   │   ├── graph.json        # 图谱数据文件
-│   │   └── backups/          # 滚动备份（保留 20 份）
-│   ├── uploads/              # 上传的图片文件
-│   └── doc_uploads/          # 上传的文档文件（.pdf/.md/.txt/.docx/.xmind）
-├── assets/                   # README 演示截图
+│   │   ├── graph.json        # Knowledge graph data
+│   │   └── backups/          # Rolling backups (retain 20)
+│   ├── uploads/              # Uploaded image files
+│   └── doc_uploads/          # Uploaded documents (.pdf/.md/.txt/.docx/.xmind)
+├── assets/                   # README screenshots
 ├── skills/
-│   └── acefelix-knowledge/   # jarvis Skill（图谱使用指引，复制到 ~/.jarvis/skills/）
-├── frontend/                 # Vue3 前端
+│   └── acefelix-knowledge/   # jarvis Skill (graph usage instructions; copy to ~/.jarvis/skills/)
+├── frontend/                 # Vue 3 frontend
 │   ├── src/
-│   │   ├── App.vue           # 主界面（三栏布局 + 右侧详情）
-│   │   ├── api/index.js      # API 请求封装
-│   │   ├── config/graph.config.js  # 3D 与宇宙主题参数
-│   │   ├── utils/            # 公共工具（排序/属性识别/行星纹理/宇宙场景/相机/标签层）
+│   │   ├── App.vue           # Main interface (three-column layout + right-side details)
+│   │   ├── api/index.js      # API request wrapper
+│   │   ├── config/graph.config.js  # 3D visualization and cosmic theme settings
+│   │   ├── utils/            # Shared utilities (sorting, property detection, planet textures, cosmic scene, camera, labels)
 │   │   └── components/
-│   │       ├── Graph3D.vue            # 3D 可视化渲染骨架（交互编排，场景/纹理/相机/标签拆分至 utils）
-│   │       ├── EntityPanel.vue        # 实体管理面板（含图片/文档属性）
-│   │       ├── RelationPanel.vue      # 关系管理面板
-│   │       ├── ReaderPanel.vue        # 阅读窗（图片/PDF/txt/md/docx 中间区域就地浏览）
-│   │       ├── TypeManager.vue        # 实体类型管理
-│   │       ├── RelationTypeManager.vue # 关系类型管理
-│   │       └── StatsBar.vue           # 统计栏组件
+│   │       ├── Graph3D.vue            # 3D renderer and interaction coordination (scene/texture/camera/labels in utils)
+│   │       ├── EntityPanel.vue        # Entity management (image/document properties)
+│   │       ├── RelationPanel.vue      # Relationship management
+│   │       ├── ReaderPanel.vue        # Inline image/PDF/txt/md/docx viewer in the central area
+│   │       ├── TypeManager.vue        # Entity type management
+│   │       ├── RelationTypeManager.vue # Relationship type management
+│   │       └── StatsBar.vue           # Statistics bar
 │   └── package.json
-├── docs/                     # 项目文档
-│   ├── ARCHITECTURE.md       # 架构文档
-│   ├── TECHNICAL.md          # 技术文档
-│   ├── API.md                # REST API 参考
-│   ├── DEPLOYMENT.md         # 部署与运维
-│   └── fixlogs/              # 修复复盘文档
-├── .github/workflows/ci.yml  # GitHub Actions CI（后端测试 + 前端构建）
-└── start.bat                 # Windows 一键启动
-```
+├── docs/                     # Project documentation
+│   ├── ARCHITECTURE.md       # Architecture
+│   ├── TECHNICAL.md          # Technical documentation
+│   ├── API.md                # REST API reference
+│   ├── DEPLOYMENT.md         # Deployment and operations
+│   └── fixlogs/              # Fix reports and retrospectives
+├── .github/workflows/ci.yml  # GitHub Actions CI (backend tests + frontend build)
+└── start.bat                 # One-click Windows startup
+\`\`\`
 
-## 快速开始
+## Quick Start
 
-> 完整步骤见 [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md)。
+> See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for the full procedure.
 >
-> 💡 **Windows 一键启动**：直接双击 `start.bat`，自动拉起后端（:8800）与前端（:5173），**就绪探测确认服务可响应后**才打开浏览器；启动输出落盘 `logs/` 便于排查。
+> 💡 **One-click startup on Windows**: Double-click \`start.bat\` to start the backend (:8800) and frontend (:5173) automatically. The browser opens **only after a readiness check confirms that the services respond**. Startup output is saved in \`logs/\` for troubleshooting.
 
-### 环境要求
+### Requirements
 
-- Python 3.11+（抽取管线使用标准库 tomllib）
+- Python 3.11+ (the extraction pipeline uses the standard-library \`tomllib\` module)
 - Node.js 16+
-- npm 或 yarn
+- npm or yarn
 
-### 1. 启动后端
+### 1. Start the Backend
 
-```bash
+\`\`\`bash
 cd backend
 python -m pip install -r requirements.txt
-python scripts/seed.py  # 首次运行初始化种子数据（已有数据会跳过）
-python api.py           # 启动 API 服务，监听 http://127.0.0.1:8800
-```
+python scripts/seed.py  # Initialize seed data on first run (skipped if data already exists)
+python api.py           # Start the API at http://127.0.0.1:8800
+\`\`\`
 
-> Windows 下若环境异常，请显式指定 `PYTHONPATH=<项目根目录>` 再 `python -m uvicorn api:app --reload --host 127.0.0.1 --port 8800`。
+> If you encounter environment issues on Windows, explicitly set \`PYTHONPATH=<project-root-directory>\` before running \`python -m uvicorn api:app --reload --host 127.0.0.1 --port 8800\`.
 
-### 2. 启动前端
+### 2. Start the Frontend
 
-```bash
+\`\`\`bash
 cd frontend
 npm install
-npm run dev             # 启动开发服务器 http://127.0.0.1:5173
-```
+npm run dev             # Start the development server at http://127.0.0.1:5173
+\`\`\`
 
-浏览器打开 **http://127.0.0.1:5173/** 即可使用。
+Open **http://127.0.0.1:5173/** in your browser.
 
-### 3. 启动 MCP Server（Agent 接入）
+### 3. Start the MCP Server (Agent Integration)
 
-```bash
+\`\`\`bash
 cd backend
-python mcp_server.py          # 启动 MCP Server，通过 stdio 供 Agent 调用
-```
+python mcp_server.py          # Start the stdio-based MCP server for agent clients
+\`\`\`
 
-> 无需单独启动，jarvis 等 Agent 客户端会在需要时自动拉起本进程。
+> You do not need to start this process separately: agent clients such as jarvis launch it automatically when required.
 
-### 4. 快速上手
+### 4. Getting Started
 
-- 左侧面板管理实体与关系，⚙ 按钮可管理类型；底部统计栏展示实体/关系数与类型分布
-- 编辑实体时可在「图片属性」粘贴图片 URL 或上传本地图片；在「文档属性」粘贴文档 URL 或上传本地文档（.pdf/.md/.txt/.docx/.xmind）
-- 点击 3D 节点查看详情（属性中的图片自动渲染，文档展示为 📄 文件名链接）；左侧实体列表同步高亮选中项并自动滚入可见区；点击图片/文档在中间阅读窗就地浏览（图片/PDF/txt/Markdown/docx 内嵌展示，xmind 降级新窗口打开），Esc 或点遮罩关闭；工具条提供「聚焦」「路径」「重置」
-- 右上角搜索框可全文搜索实体
+- Manage entities and relationships in the left panel. Use the ⚙ button to manage types. The statistics bar at the bottom shows entity/relationship counts and type distribution.
+- While editing an entity, paste an image URL or upload a local image under **Image Properties**. Under **Document Properties**, paste a document URL or upload a local file (.pdf/.md/.txt/.docx/.xmind).
+- Click a 3D node to open its details. Image properties render automatically, while documents appear as 📄 filename links. The corresponding item in the left-side entity list is highlighted and scrolled into view. Click an image or document to view it in the central reader (inline support for images, PDF, txt, Markdown, and docx; xmind opens in a new window instead). Press Esc or click the backdrop to close it. The toolbar includes **Focus**, **Path**, and **Reset**.
+- Use the search box in the upper-right corner to search entities by full text.
 
 <p align="center">
-  <img src="assets/zhishitupu2.png" alt="实体管理面板与类型过滤" width="90%">
+  <img src="assets/zhishitupu2.png" alt="Entity management panel and type filtering" width="90%">
 </p>
 
-## API 接口
+## API Endpoints
 
-| 方法 | 路径 | 说明 |
+| Method | Path | Description |
 |---|---|---|
-| GET | /api/meta | 类型/颜色/版本元数据 |
-| GET | /api/types | 实体类型列表 |
-| POST/PUT/DELETE | /api/types(/name) | 实体类型增改删 |
-| GET | /api/relation-types | 关系类型列表 |
-| POST/PUT/DELETE | /api/relation-types(/name) | 关系类型增改删 |
-| GET/POST | /api/entities(/id) | 实体查询/新增 |
-| PUT/DELETE | /api/entities/{id} | 实体更新/删除（级联删关系） |
-| GET/POST | /api/relations(/id) | 关系查询/新增 |
-| PUT/DELETE | /api/relations/{id} | 关系更新/删除 |
-| GET | /api/graph | 完整图谱（3D 渲染用） |
-| GET | /api/graph/neighbors/{id} | 邻居子图（degree 可选） |
-| GET | /api/graph/paths | 两实体间关联路径 |
-| GET | /api/graph/common | 两实体共同邻居 |
-| GET | /api/search?q= | 搜索实体 |
-| GET | /api/stats | 图谱统计 |
-| POST | /api/ingest | 文本抽取入库（dry_run 预览，闲聊零写入） |
-| POST | /api/ingest/file | 上传 .txt/.md/.json 文件抽取 |
-| POST | /api/upload | 上传图片 |
-| POST | /api/upload/doc | 上传文档（.pdf/.md/.txt/.docx/.xmind，上限 20MB） |
+| GET | /api/meta | Type, color, and version metadata |
+| GET | /api/types | List entity types |
+| POST/PUT/DELETE | /api/types(/name) | Create, update, or delete entity types |
+| GET | /api/relation-types | List relationship types |
+| POST/PUT/DELETE | /api/relation-types(/name) | Create, update, or delete relationship types |
+| GET/POST | /api/entities(/id) | Query or create entities |
+| PUT/DELETE | /api/entities/{id} | Update or delete an entity (cascading relationship deletion) |
+| GET/POST | /api/relations(/id) | Query or create relationships |
+| PUT/DELETE | /api/relations/{id} | Update or delete relationships |
+| GET | /api/graph | Full graph (for 3D rendering) |
+| GET | /api/graph/neighbors/{id} | Neighbor subgraph (optional \`degree\`) |
+| GET | /api/graph/paths | Relationship paths between two entities |
+| GET | /api/graph/common | Common neighbors of two entities |
+| GET | /api/search?q= | Search entities |
+| GET | /api/stats | Graph statistics |
+| POST | /api/ingest | Extract knowledge from text (dry-run preview; no writes for casual chat) |
+| POST | /api/ingest/file | Upload a .txt/.md/.json file for extraction |
+| POST | /api/upload | Upload an image |
+| POST | /api/upload/doc | Upload a document (.pdf/.md/.txt/.docx/.xmind; 20 MB maximum) |
 
-完整请求/响应示例见 [docs/API.md](./docs/API.md)，FastAPI 交互文档见 `http://127.0.0.1:8800/docs`。
+For complete request and response examples, see [docs/API.md](./docs/API.md). FastAPI interactive API documentation is available at \`http://127.0.0.1:8800/docs\`.
 
-## 知识抽取（GraphRAG）
+## Knowledge Extraction (GraphRAG)
 
-把一段文本交给 `POST /api/ingest`（或上传文件到 `POST /api/ingest/file`），
-LLM 自动抽取实体与关系写入图谱：
+Send text to \`POST /api/ingest\` (or upload a file to \`POST /api/ingest/file\`). The LLM automatically extracts entities and relationships and adds them to the graph.
 
-```bash
-# 预览（不写入）
+\`\`\`bash
+# Preview only (do not write to the graph)
 curl -X POST http://127.0.0.1:8800/api/ingest -H "Content-Type: application/json" \
-  -d "{\"text\": \"小明掌握 Python，正在参与 AceFelix 项目。\", \"dry_run\": true}"
-```
+  -d "{\"text\": \"Xiaoming knows Python and is contributing to the AceFelix project.\", \"dry_run\": true}"
+\`\`\`
 
-- **防噪**：内置五道闸（不挂聊天实时链路/价值预判/类型白名单/密度预检/人工确认），闲聊寒暄零写入；详见 [docs/TECHNICAL.md](./docs/TECHNICAL.md) 第 8 节
-- **模型配置**：默认走 `DASHSCOPE_API_KEY` 环境变量 + DashScope `qwen-flash`；可复制 `backend/config/ingest.toml.example` 为 `backend/config/ingest.toml` 自定义（不入库）
-- **安全**：`dry_run=true` 先预览再写入；写入前自动备份，可用 `data/backups/` 回滚
+- **Noise prevention**: Five safeguards (no direct connection to live chat, value assessment, type allowlist, density pre-check, and human confirmation) prevent casual greetings and chatter from being stored. See Section 8 of [docs/TECHNICAL.md](./docs/TECHNICAL.md).
+- **Model configuration**: By default, extraction uses the \`DASHSCOPE_API_KEY\` environment variable and DashScope's \`qwen-flash\`. To customize this, copy \`backend/config/ingest.toml.example\` to \`backend/config/ingest.toml\` (the actual config is not committed).
+- **Safety**: Use \`dry_run=true\` to preview changes before writing. Backups are created automatically before writes, and the graph can be restored from \`data/backups/\`.
 
-## Agent 接入
+## Agent Integration
 
-图谱通过 **MCP Server**（[backend/mcp_server.py](./backend/mcp_server.py)）暴露给 AI Agent，
-任何支持 MCP 协议的客户端（jarvis、Claude Desktop、Cursor 等）都能接入。
+The graph is exposed to AI agents through an **MCP server** ([backend/mcp_server.py](./backend/mcp_server.py)). Any client supporting the MCP protocol (jarvis, Claude Desktop, Cursor, etc.) can connect.
 
-### jarvis 接入
+### jarvis Integration
 
-1. 在 `~/.jarvis/mcp.json` 的 `mcpServers` 中添加：
+1. Add the following under \`mcpServers\` in \`~/.jarvis/mcp.json\`:
 
-```json
+\`\`\`json
 "acefelix-knowledge": {
   "command": "python",
-  "args": ["<项目绝对路径>/backend/mcp_server.py"]
+  "args": ["<absolute-path-to-project>/backend/mcp_server.py"]
 }
-```
+\`\`\`
 
-2. 安装 Skill（让 jarvis 知道何时/如何用图谱）：
+2. Install the Skill so jarvis knows when and how to use the graph:
 
-```bash
+\`\`\`bash
 cp -r skills/acefelix-knowledge ~/.jarvis/skills/
-```
+\`\`\`
 
-3. 重启 jarvis，即可通过 `mcp__acefelix-knowledge__*` 工具查询/维护图谱。
+3. Restart jarvis. You can now use the \`mcp__acefelix-knowledge__*\` tools to query and maintain the graph.
 
-### 其他 Agent
+### Other Agents
 
-在客户端 MCP 配置中注册同一启动命令即可，工具清单：
+Register the same launch command in your client's MCP configuration. Available tools:
 
-| 工具 | 类型 | 说明 |
+| Tool | Access | Description |
 |---|---|---|
-| `get_profile` | 只读 | 人物画像摘要（了解用户优先调用） |
-| `search_entity` / `get_entity` / `list_entities` | 只读 | 实体搜索与详情 |
-| `get_neighbors` / `find_paths` / `common_neighbors` | 只读 | 图结构查询 |
-| `get_stats` / `list_types` / `list_relation_types` | 只读 | 统计与类型表 |
-| `add_entity` / `add_relation` | 写入 | 新增实体/关系（客户端默认需用户确认） |
+| \`get_profile\` | Read-only | Summary of a person's profile (recommended as the first call when learning about the user) |
+| \`search_entity\` / \`get_entity\` / \`list_entities\` | Read-only | Entity search and details |
+| \`get_neighbors\` / \`find_paths\` / \`common_neighbors\` | Read-only | Graph structure queries |
+| \`get_stats\` / \`list_types\` / \`list_relation_types\` | Read-only | Statistics and type lists |
+| \`add_entity\` / \`add_relation\` | Write | Create entities or relationships (the client should request user confirmation by default) |
 
-> 数据文件 `backend/data/graph.json` 为本地个人数据，不入库；clone 后运行 `python scripts/seed.py` 生成初始图谱。
+> The data file \`backend/data/graph.json\` contains local personal information and is not committed to the repository. After cloning, run \`python scripts/seed.py\` to generate the initial graph.
 
-## 未来规划
+## Roadmap
 
-> 完整升级计划书（技术选型与实现思路）见 [docs/plans/upgrade-plan.md](./docs/plans/upgrade-plan.md)
+> For a complete upgrade plan, including technical choices and implementation ideas, see [docs/plans/upgrade-plan.md](./docs/plans/upgrade-plan.md).
 
-- [x] 与 JARVIS 联动，让 JARVIS 更懂用户（MCP Server 接入已完成）
-- [x] P1 GraphRAG 自动抽取：从聊天记录/文档中自动抽取实体关系（`ingest.py` + `/api/ingest`，五道防噪闸）
-- [x] P2 画像双向同步：会话提炼结果经 `ingest_text` 回写图谱，图谱画像注入系统提示（2026-08-27）
-- [ ] P3 语义检索：embedding 语义搜索替代关键词匹配
-- [ ] P4 关联推荐：相似实体与潜在兴趣推荐
-- [ ] P5 数据量增大后迁移 SQLite / Kùzu / Neo4j
+- [x] Integrate with JARVIS so JARVIS can better understand the user (MCP server integration complete).
+- [x] P1 — Automatic GraphRAG extraction: Extract entities and relationships from conversations and documents (\`ingest.py\` + \`/api/ingest\`, with five noise-prevention safeguards).
+- [x] P2 — Bidirectional profile synchronization: Write extracted conversation insights back to the graph through \`ingest_text\` and inject the graph profile into the system prompt (2026-08-27).
+- [ ] P3 — Semantic search: Replace keyword matching with embedding-based semantic retrieval.
+- [ ] P4 — Relationship recommendations: Suggest similar entities and potential interests.
+- [ ] P5 — Migrate to SQLite / Kùzu / Neo4j as the dataset grows.
 
-## 贡献与许可
+## Contributing and License
 
-欢迎通过 Issue 反馈问题、通过 PR 参与共建（提交前请确认后端单测通过、前端构建通过，文档同步更新）。
+Issues and pull requests are welcome. Before submitting a PR, make sure the backend unit tests pass, the frontend builds successfully, and the documentation is updated accordingly.
 
-本项目基于 [Apache License 2.0](./LICENSE) 开源，© 2026 aceFelix。
+This project is open source under the [Apache License 2.0](./LICENSE), © 2026 aceFelix.
