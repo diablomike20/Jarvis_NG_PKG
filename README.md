@@ -1,4 +1,4 @@
-# aceFelix Personal Knowledge Graph
+# J.A.R.V.I.S Personal Knowledge Graph
 
 [![CI](https://github.com/aceFelix/acefelix/actions/workflows/ci.yml/badge.svg)](https://github.com/aceFelix/acefelix/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
