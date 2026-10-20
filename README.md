@@ -19,7 +19,7 @@ A personal knowledge graph system built around manually maintained data. It supp
 ## Features
 
 - **Knowledge graph core**: NetworkX graph engine with JSON persistence; full CRUD operations for entities and relationships.
-- **Automatic GraphRAG extraction**: Supply text, documents, or conversation logs and an LLM extracts entities and relationships into the graph. Five noise-prevention gates keep casual chat from being written to the graph. Supports \`dry_run\` previews and duplicate detection.
+- **Automatic GraphRAG extraction**: Supply text, documents, or conversation logs and an LLM extracts entities and relationships into the graph. Five noise-prevention gates keep casual chat from being written to the graph. Supports `dry_run` previews and duplicate detection.
 - **3D visualization**: Force-directed 3D graph powered by 3d-force-graph (Three.js). Nodes are procedurally generated **realistic planets** (gas bands and storm spots, or oceans, continents, and craters), with atmospheric glow and slow rotation. The background includes stars, spiral galaxy arms, nebulae, and black holes.
 - **Dynamic types**: Create, update, delete, recolor, and rename entity and relationship types. Renaming propagates to related records; Chinese labels are supported and deletion is safeguarded.
 - **Graph queries**: Neighbor subgraphs, relationship paths between two entities, shared neighbors, and search.
@@ -31,7 +31,7 @@ A personal knowledge graph system built around manually maintained data. It supp
 
 ## Project Structure
 
-\`\`\`text
+```text
 acefelix/
 ├── backend/                  # Python backend (see backend/README.md)
 │   ├── api.py                # Entry point: FastAPI REST service (image uploads, knowledge extraction, static assets)
@@ -80,47 +80,47 @@ acefelix/
 │   └── fixlogs/              # Fix reports and retrospectives
 ├── .github/workflows/ci.yml  # GitHub Actions CI (backend tests + frontend build)
 └── start.bat                 # One-click Windows startup
-\`\`\`
+```
 
 ## Quick Start
 
 > See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for the full procedure.
 >
-> 💡 **One-click startup on Windows**: Double-click \`start.bat\` to start the backend (:8800) and frontend (:5173) automatically. The browser opens **only after a readiness check confirms that the services respond**. Startup output is saved in \`logs/\` for troubleshooting.
+> 💡 **One-click startup on Windows**: Double-click `start.bat` to start the backend (:8800) and frontend (:5173) automatically. The browser opens **only after a readiness check confirms that the services respond**. Startup output is saved in `logs/` for troubleshooting.
 
 ### Requirements
 
-- Python 3.11+ (the extraction pipeline uses the standard-library \`tomllib\` module)
+- Python 3.11+ (the extraction pipeline uses the standard-library `tomllib` module)
 - Node.js 16+
 - npm or yarn
 
 ### 1. Start the Backend
 
-\`\`\`bash
+```bash
 cd backend
 python -m pip install -r requirements.txt
 python scripts/seed.py  # Initialize seed data on first run (skipped if data already exists)
 python api.py           # Start the API at http://127.0.0.1:8800
-\`\`\`
+```
 
-> If you encounter environment issues on Windows, explicitly set \`PYTHONPATH=<project-root-directory>\` before running \`python -m uvicorn api:app --reload --host 127.0.0.1 --port 8800\`.
+> If you encounter environment issues on Windows, explicitly set `PYTHONPATH=<project-root-directory>` before running `python -m uvicorn api:app --reload --host 127.0.0.1 --port 8800`.
 
 ### 2. Start the Frontend
 
-\`\`\`bash
+```bash
 cd frontend
 npm install
 npm run dev             # Start the development server at http://127.0.0.1:5173
-\`\`\`
+```
 
 Open **http://127.0.0.1:5173/** in your browser.
 
 ### 3. Start the MCP Server (Agent Integration)
 
-\`\`\`bash
+```bash
 cd backend
 python mcp_server.py          # Start the stdio-based MCP server for agent clients
-\`\`\`
+```
 
 > You do not need to start this process separately: agent clients such as jarvis launch it automatically when required.
 
@@ -149,7 +149,7 @@ python mcp_server.py          # Start the stdio-based MCP server for agent clien
 | GET/POST | /api/relations(/id) | Query or create relationships |
 | PUT/DELETE | /api/relations/{id} | Update or delete relationships |
 | GET | /api/graph | Full graph (for 3D rendering) |
-| GET | /api/graph/neighbors/{id} | Neighbor subgraph (optional \`degree\`) |
+| GET | /api/graph/neighbors/{id} | Neighbor subgraph (optional `degree`) |
 | GET | /api/graph/paths | Relationship paths between two entities |
 | GET | /api/graph/common | Common neighbors of two entities |
 | GET | /api/search?q= | Search entities |
@@ -159,21 +159,21 @@ python mcp_server.py          # Start the stdio-based MCP server for agent clien
 | POST | /api/upload | Upload an image |
 | POST | /api/upload/doc | Upload a document (.pdf/.md/.txt/.docx/.xmind; 20 MB maximum) |
 
-For complete request and response examples, see [docs/API.md](./docs/API.md). FastAPI interactive API documentation is available at \`http://127.0.0.1:8800/docs\`.
+For complete request and response examples, see [docs/API.md](./docs/API.md). FastAPI interactive API documentation is available at `http://127.0.0.1:8800/docs`.
 
 ## Knowledge Extraction (GraphRAG)
 
-Send text to \`POST /api/ingest\` (or upload a file to \`POST /api/ingest/file\`). The LLM automatically extracts entities and relationships and adds them to the graph.
+Send text to `POST /api/ingest` (or upload a file to `POST /api/ingest/file`). The LLM automatically extracts entities and relationships and adds them to the graph.
 
-\`\`\`bash
+```bash
 # Preview only (do not write to the graph)
 curl -X POST http://127.0.0.1:8800/api/ingest -H "Content-Type: application/json" \
   -d "{\"text\": \"Xiaoming knows Python and is contributing to the AceFelix project.\", \"dry_run\": true}"
-\`\`\`
+```
 
 - **Noise prevention**: Five safeguards (no direct connection to live chat, value assessment, type allowlist, density pre-check, and human confirmation) prevent casual greetings and chatter from being stored. See Section 8 of [docs/TECHNICAL.md](./docs/TECHNICAL.md).
-- **Model configuration**: By default, extraction uses the \`DASHSCOPE_API_KEY\` environment variable and DashScope's \`qwen-flash\`. To customize this, copy \`backend/config/ingest.toml.example\` to \`backend/config/ingest.toml\` (the actual config is not committed).
-- **Safety**: Use \`dry_run=true\` to preview changes before writing. Backups are created automatically before writes, and the graph can be restored from \`data/backups/\`.
+- **Model configuration**: By default, extraction uses the `DASHSCOPE_API_KEY` environment variable and DashScope's `qwen-flash`. To customize this, copy `backend/config/ingest.toml.example` to `backend/config/ingest.toml` (the actual config is not committed).
+- **Safety**: Use `dry_run=true` to preview changes before writing. Backups are created automatically before writes, and the graph can be restored from `data/backups/`.
 
 ## Agent Integration
 
@@ -181,22 +181,22 @@ The graph is exposed to AI agents through an **MCP server** ([backend/mcp_server
 
 ### jarvis Integration
 
-1. Add the following under \`mcpServers\` in \`~/.jarvis/mcp.json\`:
+1. Add the following under `mcpServers` in `~/.jarvis/mcp.json`:
 
-\`\`\`json
+```json
 "acefelix-knowledge": {
   "command": "python",
   "args": ["<absolute-path-to-project>/backend/mcp_server.py"]
 }
-\`\`\`
+```
 
 2. Install the Skill so jarvis knows when and how to use the graph:
 
-\`\`\`bash
+```bash
 cp -r skills/acefelix-knowledge ~/.jarvis/skills/
-\`\`\`
+```
 
-3. Restart jarvis. You can now use the \`mcp__acefelix-knowledge__*\` tools to query and maintain the graph.
+3. Restart jarvis. You can now use the `mcp__acefelix-knowledge__*` tools to query and maintain the graph.
 
 ### Other Agents
 
@@ -204,21 +204,21 @@ Register the same launch command in your client's MCP configuration. Available t
 
 | Tool | Access | Description |
 |---|---|---|
-| \`get_profile\` | Read-only | Summary of a person's profile (recommended as the first call when learning about the user) |
-| \`search_entity\` / \`get_entity\` / \`list_entities\` | Read-only | Entity search and details |
-| \`get_neighbors\` / \`find_paths\` / \`common_neighbors\` | Read-only | Graph structure queries |
-| \`get_stats\` / \`list_types\` / \`list_relation_types\` | Read-only | Statistics and type lists |
-| \`add_entity\` / \`add_relation\` | Write | Create entities or relationships (the client should request user confirmation by default) |
+| `get_profile` | Read-only | Summary of a person's profile (recommended as the first call when learning about the user) |
+| `search_entity` / `get_entity` / `list_entities` | Read-only | Entity search and details |
+| `get_neighbors` / `find_paths` / `common_neighbors` | Read-only | Graph structure queries |
+| `get_stats` / `list_types` / `list_relation_types` | Read-only | Statistics and type lists |
+| `add_entity` / `add_relation` | Write | Create entities or relationships (the client should request user confirmation by default) |
 
-> The data file \`backend/data/graph.json\` contains local personal information and is not committed to the repository. After cloning, run \`python scripts/seed.py\` to generate the initial graph.
+> The data file `backend/data/graph.json` contains local personal information and is not committed to the repository. After cloning, run `python scripts/seed.py` to generate the initial graph.
 
 ## Roadmap
 
 > For a complete upgrade plan, including technical choices and implementation ideas, see [docs/plans/upgrade-plan.md](./docs/plans/upgrade-plan.md).
 
 - [x] Integrate with JARVIS so JARVIS can better understand the user (MCP server integration complete).
-- [x] P1 — Automatic GraphRAG extraction: Extract entities and relationships from conversations and documents (\`ingest.py\` + \`/api/ingest\`, with five noise-prevention safeguards).
-- [x] P2 — Bidirectional profile synchronization: Write extracted conversation insights back to the graph through \`ingest_text\` and inject the graph profile into the system prompt (2026-08-27).
+- [x] P1 — Automatic GraphRAG extraction: Extract entities and relationships from conversations and documents (`ingest.py` + `/api/ingest`, with five noise-prevention safeguards).
+- [x] P2 — Bidirectional profile synchronization: Write extracted conversation insights back to the graph through `ingest_text` and inject the graph profile into the system prompt (2026-08-27).
 - [ ] P3 — Semantic search: Replace keyword matching with embedding-based semantic retrieval.
 - [ ] P4 — Relationship recommendations: Suggest similar entities and potential interests.
 - [ ] P5 — Migrate to SQLite / Kùzu / Neo4j as the dataset grows.
